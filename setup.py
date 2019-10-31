@@ -185,7 +185,7 @@ setup(
     # executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'bugcatcher-ci=bugcatcher-ci:main',
+            'bci=bugcatcher:main',
         ],
     },
 
