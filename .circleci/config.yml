@@ -4,7 +4,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/python:3.7.5
+      - image: circleci/python:3.8
     environment: &environment
       FTL_SID: XxiOH6GkMZHSmSqxaaieWoMfNHlEUC6xvaO9JSuT
     steps: &steps

@@ -11,6 +11,7 @@ class CI:
     def __init__(self, sid, project):
         self.sid = sid
         self.project = project
+        self.severity_level = 'medium'
 
 
     # Parameter Methods
@@ -39,32 +40,44 @@ class CI:
     # Main Methods
     def push(self, project, items):
         project = project or self.project
+        check_creds(self.sid, project)
 
         print("Uploading \"%s\" code to BugCatcher..." % project)
 
-        push = subprocess.check_output([
-            *self.build_ftl_cmd(project),
-            "push",
-            items
-        ])
-        assert push
+        push = None
+        try:
+            push = subprocess.check_output([
+                *self.build_ftl_cmd(project),
+                "push",
+                items
+            ])
+        except:
+            print("Error pushing code to BugCatcher. Please check your credentials.")
 
         print_bytes(push)
+        
         return push
 
 
     def test(self, project, severity_level):
         project = project or self.project
         severity_level = severity_level or self.severity_level
+        check_creds(self.sid, project)
 
         print("Running tests on \"%s\" using BugCatcher..." % project)
 
-        test = subprocess.check_output([
-            *self.build_ftl_cmd(project),
-            "--json",
-            "test"
-        ])
-        assert test
+        test = None
+        try:
+            test = subprocess.check_output([
+                *self.build_ftl_cmd(project),
+                "--json",
+                "test"
+            ])
+        except:
+            print("Error testing code with BugCatcher. Please check your credentials.")
+
+        if not test:
+            return
 
         print("BugCatcher results for \"%s\":" % project)
 
@@ -120,9 +133,21 @@ class CI:
 
 
 # Helpers
+def check_creds(sid, project):
+    if not sid:
+        print("BugCatcher SID not found. Please go to bugcatcher.fasterthanlight.dev to get a SID.")
+
+    if not project:
+        print("BugCatcher PROJECT not found. Please specify a project name.")
+
+
 def print_bytes(b):
+    if not b:
+        return
+
     p = b.decode("utf-8")
-    assert p
+    if not p:
+        return
 
     for row in p.split('\n'):
         print(row)
